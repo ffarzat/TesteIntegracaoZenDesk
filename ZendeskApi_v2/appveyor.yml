@@ -1,0 +1,30 @@
+version: 3.0.{build}
+os: Visual Studio 2015
+configuration: Release
+platform: Any CPU
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.*'
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
+before_build:
+- ps: >-
+    Get-ChildItem -Path "C:\projects\zendeskapi-v2\packages" -Recurse | Remove-Item -Force -Recurse
+    
+    nuget.exe restore
+build:
+  verbosity: minimal
+test_script:
+- ps: nunit-console C:\projects\zendeskapi-v2\Tests\bin\Release\Tests.dll /framework:net-4.5
+artifacts:
+- path: '\ZendeskApi_v2_Package\*.nupkg'
+  name: Pakage
+deploy:
+- provider: NuGet
+  api_key:
+    secure: 8IojfvgiN2VwaySuRZBgfg3TQCxzXFlon6qLV2BhmGqBamZRvn4s0afGBSlap7WR
+  skip_symbols: true
+  artifact: Pakage
+  on:
+    branch: master
